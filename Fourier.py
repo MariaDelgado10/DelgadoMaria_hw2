@@ -25,13 +25,33 @@ plt.savefig("Señales.png")
 plt.show()
 
 #Trannsformada discreta de Fourier de signal.dat
-N=len(signal)
-#def fourier(signal):
-#    val_transf=[]
- #   for i in range(0,N):
+N=(len(signal))
+def fourier(signal):
+    
+    y=signal[:,1]
+    x=signal[:,0]
+    N = len(y)
+        
+    val_transfreal=np.zeros(0)
+    val_transimg=np.zeros(0)
+    n = np.linspace(0, N-1, N)
+   # for i in range(0,N):
 #        transformada=0
-#        for k in range(0,N):
-#            transformada+=(signal[k]*np.exp((-(1j)*2*np.pi*k*i)/N))
+    for k in range(N):
+        val_transfreal[k]=np.sum(y[k]*np.cos(-2*np.pi*k*n/N))
+        val_transimg[k]=np.sum(y[k]*np.sin(-2*np.pi*k*n/N))
+                                 
+    frecuencias = np.zeros(N)
+    dtiempo = 1.0/(2.0*(x[-1]-x[-2]))*(1/(N/2))  
+                                    
+         
+    for i in range(int(N/2)):
+        frecuencias[i] = (i+1)*dtiempo
+    for i in range(-1,-int(N/2)-1, -1):
+        frecuencias[i] = (i)*dtiempo
+    return frecuencias, val_transfreal, val_transimg
+    #return(N)                       
+#frecuecia,transfreal,transfimg = fourier(signal)
 #        val_transf.append(transformada)
 #    return((val_transf))
 #print((fourier(signal)))
@@ -57,17 +77,38 @@ plt.legend()
 plt.title("frecuencias con fft")
 plt.savefig("Fourier_trans.png")
 
-#@_autogen_docstring(Axes.specgram)
-#def specgram(
-#        frecuencias, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
-#        noverlap=None, cmap=None, xextent=None, pad_to=None,
-#        sides=None, scale_by_freq=None, mode=None, scale=None,
-#        vmin=None, vmax=None, *, data=None, **kwargs):
-#    __ret = gca().specgram( frecuencias, NFFT=NFFT, Fs=Fs, Fc=Fc, detrend=detrend, window=window,
-#        noverlap=noverlap, cmap=cmap, xextent=xextent, pad_to=pad_to,
-#        sides=sides, scale_by_freq=scale_by_freq, mode=mode,
-#        scale=scale, vmin=vmin, vmax=vmax, **({"data": data} if data
-#        is not None else {}), **kwargs)
-#    sci(__ret[-1])
-#    return __ret
+plt.figure()
+plt.specgram(transformada, NFFT=256, Fs=512)
+plt.specgram(transformada2, NFFT=256, Fs=512)
+plt.title("espectograma de las dos señales")
+plt.savefig("espectograma2señales.png")
 
+
+temblor=np.genfromtxt("temblor.txt", skip_header=4)
+plt.figure()
+plt.plot(temblor)
+plt.xlabel("tiempo")
+plt.ylabel("señal sismica")
+plt.title("señal sismica vs tiempo")
+plt.savefig("temblor.png")
+
+transformada_temblor=np.fft.fft(temblor,N,norm=None)
+transformada=np.fft.fft(temblor,N,norm=None)
+dtiempo_temblor=temblor[1]-temblor[0]
+frecuencias_temblor=np.fft.fftfreq(N, d=dtiempo_temblor)
+
+plt.figure()
+plt.plot(frecuencias_temblor,transformada_temblor)
+plt.xlabel("frecuencia ")
+plt.ylabel("transformada ")
+plt.legend()
+plt.title("tranformada de fourier del temblor")
+plt.savefig("transfouriertemblor.png")
+
+
+plt.figure()
+plt.specgram(temblor, NFFT=256, Fs=512)
+plt.title("espectograma de la señal sismica")
+plt.xlabel("tiempo")
+plt.ylabel("frecuencias")
+plt.savefig("espectogramatemblor.png")
