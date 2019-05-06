@@ -6,9 +6,9 @@ from matplotlib import mlab
 signal= np.genfromtxt("signal.dat")
 signalsuma=np.genfromtxt("signalSuma.dat")
 
-signal_x=np.genfromtxt("signal.dat", delimiter=",")[:,0]
+signal_x=np.genfromtxt("signal.dat")[:,0]
 #print(signal_x)
-signal_y=np.genfromtxt("signal.dat", delimiter=",")[:,1]
+signal_y=np.genfromtxt("signal.dat")[:,1]
 #print(signal_y)
 suma_x=np.genfromtxt("signalSuma.dat")[:,0]
 suma_y=np.genfromtxt("signalSuma.dat")[:,1]
@@ -38,11 +38,10 @@ def fourier(signal):
    # for i in range(0,N):
 #        transformada=0
     for k in range(N):
-        val_transfreal[k]=np.sum(y[k]*np.cos(-2*np.pi*k*n/N))
-        val_transimg[k]=np.sum(y[k]*np.sin(-2*np.pi*k*n/N))
+        val_trans[k]=np.sum(y[k]*np.exp(-2*1j*np.pi*k*n/N))
                                  
     frecuencias = np.zeros(N)
-    dtiempo = 1.0/(2.0*(x[-1]-x[-2]))*(1/(N/2))  
+    dtiempo =x[1]-x[0]
                                     
          
     for i in range(int(N/2)):
@@ -51,14 +50,11 @@ def fourier(signal):
         frecuencias[i] = (i)*dtiempo
     return frecuencias, val_transfreal, val_transimg
     #return(N)                       
-#frecuecia,transfreal,transfimg = fourier(signal)
-#        val_transf.append(transformada)
-#    return((val_transf))
-#print((fourier(signal)))
+    
 
 #print(len(val_transf))
 #plt.plot(fourier(signal))
-#plt.savefig("Fourier_trans.png")
+#plt.savefig("Fourierpropia_trans.png")
 
 transformada=np.fft.fft(signal_y,N,norm=None)
 transformada2=np.fft.fft(suma_y,N,norm=None)
@@ -68,19 +64,30 @@ frecuencias=np.fft.fftfreq(N, d=dtiempo)
 frecuencias2=np.fft.fftfreq(N, d=dtiempo2)
 print(frecuencias)
 
-plt.figure()
+plt.figure(figsize=(10,5))
+plt.subplot(2,2,1)
 plt.plot(frecuencias,transformada)
+plt.xlabel("frecuencias")
+plt.ylabel("transformada")
+plt.title("transformada signal con fft")
+plt.subplot(2,2,2)
 plt.plot(frecuencias2,transformada2)
 plt.xlabel("frecuencias")
 plt.ylabel("transformada")
-plt.legend()
-plt.title("frecuencias con fft")
+plt.title("transformada signalsuma con fft")
 plt.savefig("Fourier_trans.png")
 
-plt.figure()
-plt.specgram(transformada, NFFT=256, Fs=512)
-plt.specgram(transformada2, NFFT=256, Fs=512)
-plt.title("espectograma de las dos señales")
+plt.figure(figsize=(10,5))
+plt.subplot(2,2,1)
+plt.specgram(signal_y, NFFT=256, Fs=1/dtiempo) #ojojojojojojojo esto es 1/dt
+plt.xlabel("tiempo")
+plt.ylabel("frecuencias")
+plt.title("espectograma de la señal signal")
+plt.subplot(2,2,2)
+plt.specgram(suma_y, NFFT=256, Fs=1/dtiempo2)
+plt.title("espectograma de la señal signalsuma")
+plt.xlabel("tiempo")
+plt.ylabel("frecuencias")
 plt.savefig("espectograma2señales.png")
 
 
@@ -101,7 +108,6 @@ plt.figure()
 plt.plot(frecuencias_temblor,transformada_temblor)
 plt.xlabel("frecuencia ")
 plt.ylabel("transformada ")
-plt.legend()
 plt.title("tranformada de fourier del temblor")
 plt.savefig("transfouriertemblor.png")
 
